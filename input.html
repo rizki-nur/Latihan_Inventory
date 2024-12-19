@@ -4,25 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Input Produk</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .form-container { width: 300px; margin: auto; padding-top: 50px; }
+        .form-container label, .form-container input, .form-container button { display: block; width: 100%; }
+        .form-container input[type="submit"] { margin-top: 10px; }
+    </style>
 </head>
 <body>
-    <form action="input.php" method="post">
-        <label for="product_code">Kode Barang:</label>
-        <input type="text" id="product_code" name="product_code" required><br><br>
-        <label for="product_name">Nama Barang:</label>
-        <input type="text" id="product_name" name="product_name" required><br><br>
-        <label for="category">Kategori:</label>
-        <input type="text" id="category" name="category" required><br><br>
-        <label for="unit">Unit:</label>
-        <input type="text" id="unit" name="unit" required><br><br>
-        <label for="purchase_price">Harga Beli:</label>
-        <input type="number" step="0.01" id="purchase_price" name="purchase_price" required><br><br>
-        <label for="selling_price">Harga Jual:</label>
-        <input type="number" step="0.01" id="selling_price" name="selling_price" required><br><br>
-        <label for="stock">Stok:</label>
-        <input type="number" id="stock" name="stock" required><br><br>
-        <input type="submit" value="Submit">
-      	<input type="reset" value="Reset">
-    </form>
+    <div class="form-container">
+        <form id="productForm">
+            <label for="product_code">Kode Barang:</label>
+            <div style="display: flex; gap: 5px;">
+                <input type="text" id="product_code" name="product_code" required readonly>
+                <button type="button" id="generateCode">Generate</button>
+            </div><br>
+            <label for="product_name">Nama Barang:</label>
+            <input type="text" id="product_name" name="product_name" required><br><br>
+            <label for="category">Kategori:</label>
+			<select id="category" name="category" required>
+   			<option value="">-- Pilih Kategori --</option>
+			</select><br><br>
+            <label for="unit">Unit:</label>
+            <input type="text" id="unit" name="unit" required><br><br>
+            <label for="purchase_price">Harga Beli:</label>
+            <input type="number" step="0.01" id="purchase_price" name="purchase_price" required><br><br>
+            <label for="selling_price">Harga Jual:</label>
+            <input type="number" step="0.01" id="selling_price" name="selling_price" required><br><br>
+            <label for="stock">Stok:</label>
+            <input type="number" id="stock" name="stock" required><br><br>
+            <input type="submit" value="Submit">
+            <input type="reset" value="Reset">
+        </form>
+    </div>
+    <script>
+       // Load kategori ke dropdown
+function loadCategoriesToDropdown() {
+    fetch('categories.php?action=list')
+        .then(response => response.json())
+        .then(data => {
+            const categorySelect = document.getElementById('category');
+            categorySelect.innerHTML = '<option value="">-- Pilih Kategori --</option>';
+            data.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.id;
+                option.textContent = category.name;
+                categorySelect.appendChild(option);
+            });
+        });
+}
+
+// Panggil fungsi ini di awal
+loadCategoriesToDropdown();
+
+        // Generate kode barang
+        document.getElementById("generateCode").addEventListener("click", function () {
+            const randomCode = "PRD-" + Math.floor(1000 + Math.random() * 9000); // Contoh: PRD-1234
+            document.getElementById("product_code").value = randomCode;
+        });
+
+        // Submit form
+        document.getElementById("productForm").addEventListener("submit", function(event){
+            event.preventDefault();
+            const formData = new FormData(this);
+            fetch('input.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Produk berhasil ditambahkan!");
+                    this.reset();
+                } else {
+                    alert(data.message);
+                }
+            });
+        });
+    </script>
 </body>
 </html>

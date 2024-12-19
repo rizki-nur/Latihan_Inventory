@@ -4,14 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tambah Quantity</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .form-container { width: 300px; margin: auto; padding-top: 50px; }
+        .form-container label, .form-container input, .form-container select { display: block; width: 100%; }
+        .form-container input[type="submit"] { margin-top: 10px; }
+    </style>
 </head>
 <body>
-    <form action="add_quantity.php" method="post">
-        <label for="product_code">Kode Barang:</label>
-        <input type="text" id="product_code" name="product_code" required><br><br>
-        <label for="quantity">Tambah Quantity:</label>
-        <input type="number" id="quantity" name="quantity" required><br><br>
-        <input type="submit" value="Tambah">
-    </form>
+    <div class="form-container">
+        <form id="quantityForm">
+            <label for="product_name">Nama Barang:</label>
+            <select id="product_name" name="product_name" required>
+                <option value="">-- Pilih Barang --</option>
+            </select><br><br>
+            <label for="quantity">Tambah Quantity:</label>
+            <input type="number" id="quantity" name="quantity" required><br><br>
+            <input type="submit" value="Tambah">
+            <input type="reset" value="Reset">
+        </form>
+    </div>
+    <script>
+        // Ambil data produk dari database
+        fetch('get_products.php')
+            .then(response => response.json())
+            .then(data => {
+                const productSelect = document.getElementById("product_name");
+                data.forEach(product => {
+                    const option = document.createElement("option");
+                    option.value = product;
+                    option.textContent = product;
+                    productSelect.appendChild(option);
+                });
+            });
+
+        // Proses pengiriman form
+        document.getElementById("quantityForm").addEventListener("submit", function(event){
+            event.preventDefault();
+            const formData = new FormData(this);
+            fetch('quantity.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+            });
+        });
+    </script>
 </body>
 </html>

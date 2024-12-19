@@ -1,5 +1,5 @@
 <?php
-$conn = new mysqli("localhost", "root", "", "inventory_db");
+$conn = new mysqli("localhost", "root", "1234", "inventory_db");
 
 $query = "SELECT * FROM products";
 $result = $conn->query($query);
