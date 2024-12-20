@@ -1,5 +1,5 @@
 <?php
-$conn = new mysqli("localhost", "root", "1234", "inventory_db");
+$conn = new mysqli("localhost", "root", "", "inventory_db");
 
 if ($conn->connect_error) {
     die("Koneksi gagal: " . $conn->connect_error);

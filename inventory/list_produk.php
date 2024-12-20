@@ -1,8 +1,15 @@
 <?php
-$conn = new mysqli("localhost", "root", "1234", "inventory_db");
+require 'hapus.php';
+
+$conn = new mysqli("localhost", "root", "", "inventory_db");
 
 $query = "SELECT * FROM products";
 $result = $conn->query($query);
+
+$products = [];
+while ($row = $result->fetch_assoc()) {
+    $products[] = $row; // menyimpan hasil query ke array $products
+}
 ?>
 
 <!DOCTYPE html>
@@ -23,25 +30,29 @@ $result = $conn->query($query);
             <th>Harga Beli</th>
             <th>Harga Jual</th>
             <th>Stok</th>
+            <th>Aksi</th>
         </tr>
-        <?php
-        if ($result->num_rows > 0) {
-            $no = 1;
-            while ($row = $result->fetch_assoc()) {
-                echo "<tr>
-                    <td>" . $no . "</td>
-                    <td>" . $row["product_code"] . "</td>
-                    <td>" . $row["product_name"] . "</td>
-                    <td>" . $row["category"] . "</td>
-                    <td>" . $row["unit"] . "</td>
-                    <td>" . $row["purchase_price"] . "</td>
-                    <td>" . $row["selling_price"] . "</td>
-                    <td>" . $row["stock"] . "</td>
-                </tr>";
-                $no++;
-            }
-        }
-        ?>
+        <?php foreach ($products as $index => $row) : ?>
+            <tr>
+                <td><?= $index + 1; ?></td>
+                <td><?= htmlspecialchars($row["product_code"]); ?></td>
+                <td><?= htmlspecialchars($row["product_name"]); ?></td>
+                <td><?= htmlspecialchars($row["category"]); ?></td>
+                <td><?= htmlspecialchars($row["unit"]); ?></td>
+                <td><?= htmlspecialchars($row["purchase_price"]); ?></td>
+                <td><?= htmlspecialchars($row["selling_price"]); ?></td>
+                <td><?= htmlspecialchars($row["stock"]); ?></td>
+                <td>
+                    <a href="hapus.php?id=<?= $row["id"]; ?>" onclick="return confirm('Anda ingin menghapus data?');">Hapus</a>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+
+        <?php if (empty($products)) : ?>
+            <tr>
+                <td colspan="9" style="text-align: center;">Data tidak tersedia</td>
+            </tr>
+        <?php endif; ?>
     </table>
 </body>
 </html>
